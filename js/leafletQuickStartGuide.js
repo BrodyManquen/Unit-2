@@ -42,5 +42,3 @@ function onMapClick(e) {
 }
 
 mymap.on('click', onMapClick);
-
-$(document).ready(initialize);

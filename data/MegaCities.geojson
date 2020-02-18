@@ -64,7 +64,7 @@
     {
       "type": "Feature",
       "properties": {
-        "City": "S�o Paulo",
+        "City": "Sao Paulo",
         "Pop_1985": 13.39,
         "Pop_1990": 14.78,
         "Pop_1995": 15.91,
@@ -104,7 +104,7 @@
     {
       "type": "Feature",
       "properties": {
-        "City": "Ciudad de M�xico (Mexico City)",
+        "City": "Ciudad de Mexico (Mexico City)",
         "Pop_1985": 14.28,
         "Pop_1990": 15.64,
         "Pop_1995": 17.02,

@@ -1,7 +1,7 @@
 var map;
 
 function createMap(){
-  map = L.map('mapid', {
+  map = L.map("mapid", {
     center: [20, 0],
     zoom: 2
   });
@@ -12,24 +12,24 @@ function createMap(){
       id: 'mapbox/streets-v11',
       accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
   }).addTo(map);
-
   getData();
 };
 
-//function onEachFeature(feature, layer){
-  //var popupContent = "";
-  //if (feature.properties){
-    //for (var property in feature.properties){
-      //popupContent += "<p>" + property + ":" + feature.properties[property]+"\n"+"</p";
-    //}
-    //layer.bindPopup(popupContent);
-  //};
-//};
+function onEachFeature(feature, layer){
+  var popupContent = "";
+  if (feature.properties){
+    for (var property in feature.properties){
+      popupContent += "<p>" + property + ":" + feature.properties[property]+"\n"+"</p";
+    }
+    layer.bindPopup(popupContent);
+  };
+};
 
 function getData(mapid){
-   $.getJSON("data/Museums.geojson", function(response){
+  console.log("it displays the data on the map or else it gets the hose again")
+   $.getJSON("data/museumdatabase.geojson", function(response){
                //create marker options
-               var geojsonMarkerOptions = {
+                   var geojsonMarkerOptions = {
                    radius: 8,
                    fillColor: "#ff7800",
                    color: "#000",
@@ -43,7 +43,7 @@ function getData(mapid){
                    pointToLayer: function (feature, latlng){
                        return L.circleMarker(latlng, geojsonMarkerOptions);
                    },
-                   //onEachFeature: onEachFeature
+                   onEachFeature: onEachFeature
                }).addTo(map);
            });
 

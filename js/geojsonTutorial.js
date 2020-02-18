@@ -6,8 +6,12 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     id: 'mapbox/streets-v11',
     accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
 }).addTo(map);
-
-var geojsonFeature = {
+function onEachFeature(feature, layer) {
+  if (feature.properties && feature.properties.popupContent){
+    layer.bindPopup(feature.properties.popupContent);
+  }
+}
+var geojsonFeature = {  //creates a geoJson feature
     "type": "Feature",
     "properties": {
         "name": "Coors Field",
@@ -20,11 +24,15 @@ var geojsonFeature = {
     }
 };
 
-L.geoJSON(geojsonFeature).addTo(map);
-var myLayer = L.geoJSON().addTo(map);
-myLayer.addData(geojsonFeature);
+L.geoJson(geojsonFeature, {
+  onEachFeature: onEachFeature
+}).addTo(map);
 
-var myLines = [{
+L.geoJSON(geojsonFeature).addTo(map); //adds geojson Feature to map
+var myLayer = L.geoJSON().addTo(map);
+myLayer.addData(geojsonFeature); //adds GeoJson data to layer
+
+var myLines = [{  //creates LineString variable
     "type": "LineString",
     "coordinates": [[-100, 40], [-105, 45], [-110, 55]]
 }, {
@@ -32,18 +40,18 @@ var myLines = [{
     "coordinates": [[-105, 40], [-110, 45], [-115, 55]]
 }];
 
-var myStyle = {
+var myStyle = {  //creates custom style
     "color": "#ff7800",
     "weight": 5,
     "opacity": 0.65
 };
-L.geoJSON(myLines, {
+L.geoJSON(myLines, {  //sets a geojson feature with myLines and myStyle
     style: myStyle
-}).addTo(map)
+}).addTo(map)  //adds this geojson feature to map
 
-var states = [{
+var states = [{  //creates geojson polygon features to represent states
     "type": "Feature",
-    "properties": {"party": "Republican"},
+    "properties": {"party": "Republican"}, //adds political party to properties
     "geometry": {
         "type": "Polygon",
         "coordinates": [[
@@ -70,30 +78,30 @@ var states = [{
 }];
 
 L.geoJSON(states, {
-    style: function(feature) {
+    style: function(feature) {  //sets geoJSON style of the states features
         switch (feature.properties.party) {
-            case 'Republican': return {color: "#ff0000"};
-            case 'Democrat':   return {color: "#0000ff"};
+            case 'Republican': return {color: "#ff0000"}; //colors Republican red
+            case 'Democrat':   return {color: "#0000ff"}; //colors Democrat blue
         }
     }
 }).addTo(map);
 
-var geojsonMarkerOptions = {
+var geojsonMarkerOptions = { //sets geojson marker options
     radius: 8,
-    fillColor: "#ff7800",
+    fillColor: "#ff0000",
     color: "#000",
     weight: 1,
     opacity: 1,
     fillOpacity: 0.8
 };
 
-L.geoJSON(someGeojsonFeature, {
+L.geoJSON(geojsonFeature, {
     pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, geojsonMarkerOptions);
+        return L.circleMarker(latlng, geojsonMarkerOptions); //creates circle marker at geojsonfeature with parameters set by geojsonMarkerOptions
     }
 }).addTo(map);
 
-var someFeatures = [{
+var someFeatures = [{ //sets a two geojson features
     "type": "Feature",
     "properties": {
         "name": "Coors Field",
@@ -117,6 +125,6 @@ var someFeatures = [{
 
 L.geoJSON(someFeatures, {
     filter: function(feature, layer) {
-        return feature.properties.show_on_map;
+        return feature.properties.show_on_map;  //shows geojson someFeatures with property "show_on_map : true" on map
     }
 }).addTo(map);

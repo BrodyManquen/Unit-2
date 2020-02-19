@@ -2,3 +2,6 @@
 
 #mapid {height: 750px; }
 #mapid {width: 70%;}
+.leaflet-popup-content p {
+    margin: 0.2em 0;
+}

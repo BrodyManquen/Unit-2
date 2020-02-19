@@ -59,7 +59,9 @@ function pointToLayer(feature, latlng){
   var popupContent = "<p><b>Museum:</b> " + feature.properties.Name + "</p>";
   var year = attribute.split("_")[1];
   popupContent += "<p><b>Attendance in "+year+":</b> "+feature.properties[attribute]+"</p>";
-  layer.bindPopup(popupContent);
+  layer.bindPopup(popupContent, {
+        offset: new L.Point(0,-options.radius)
+    });
   return layer;
 };
 
@@ -68,55 +70,6 @@ function createPropSymbols(data, mapid){
     pointToLayer: pointToLayer
   }).addTo(map);
 };
-
-// function getData(mapid){
-//   console.log("it displays the data on the map or else it gets the hose again")
-//    $.getJSON("data/museumdatabase.geojson", function(response){
-//                //create marker options
-//                    var geojsonMarkerOptions = {
-//                    radius: 8,
-//                    fillColor: "#ff7800",
-//                    color: "#000",
-//                    weight: 1,
-//                    opacity: 1,
-//                    fillOpacity: 0.8
-//                };
-//
-//                //create a Leaflet GeoJSON layer and add it to the map
-//                L.geoJson(response, {
-//                    pointToLayer: function (feature, latlng){
-//                        return L.circleMarker(latlng, geojsonMarkerOptions);
-//                    },
-//                    //onEachFeature: onEachFeature
-//                }).addTo(map);
-//            });
-//
-//   };
-
-///// Create Proportional Symbols
-// function createPropSymbols(data){
-//
-//     var attribute = "attendance_2012";
-//     //create marker options
-//     var geojsonMarkerOptions = {
-//         radius: 8,
-//         fillColor: "#ff7800",
-//         color: "#000",
-//         weight: 1,
-//         opacity: 1,
-//         fillOpacity: 0.8
-//     };
-//
-//     //create a Leaflet GeoJSON layer and add it to the map
-//     L.geoJson(data, {
-//         pointToLayer: function (feature, latlng) {
-//             var attValue = Number(feature.properties[attribute]);
-//             geojsonMarkerOptions.radius = calcPropRadius(attValue);
-//             //console.log(feature.properties, attValue);
-//             return L.circleMarker(latlng, geojsonMarkerOptions);
-//         }
-//     }).addTo(map);
-// };
 
 //Step 2: Import GeoJSON data
 function getData(mapid){

@@ -70,6 +70,20 @@ function createPropSymbols(data, mapid){
     pointToLayer: pointToLayer
   }).addTo(map);
 };
+function createSequenceControls(){
+    //create range input element (slider)
+    $("#panel").append('<input class="range-slider" type="range">');
+    $('.range-slider').attr({
+        max: 7,
+        min: 0,
+        value: 0,
+        step: 1
+    });
+    $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+    $('#panel').append('<button class="step" id="forward">Forward</button>');
+    $('#reverse').html('<img src="img/reverse.png">');
+    $('#forward').html('<img src="img/forward.png">');
+};
 
 //Step 2: Import GeoJSON data
 function getData(mapid){
@@ -78,6 +92,7 @@ function getData(mapid){
             minValue = calcMinValue(response);
             //call function to create proportional symbols
             createPropSymbols(response);
+            createSequenceControls();
     });
 };
 

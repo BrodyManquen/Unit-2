@@ -15,23 +15,22 @@ function createMap(){
   }).addTo(map);
   getData();
 };
-
+//days start on Jan 22 2020 (01-22-2020)
 function calcMinValue(data){
   var allValues = [];
-  for(var museum of data.features){
-    for(var year = 2012; year <=2017; year+=1){
-      var value = museum.properties["attendance_" + String(year)];
+  for(var hub of data.features){
+    for(var day = 1; day <=38; day+=1){
+      var value = hub.properties[day];
       allValues.push(value);
     }
   }
   var minValue = Math.min(...allValues)
   console.log(minValue)
   return minValue;
-  //console.log(minValue);
+
 };
 
 function calcPropRadius(attValue){
-  console.log(minValue)
   var minRadius = 5
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
   //console.log(radius)
@@ -61,9 +60,10 @@ function pointToLayer(feature, latlng, attributes){
   var attValue = Number(feature.properties[attribute]);
   options.radius = calcPropRadius(attValue);
   var layer = L.circleMarker(latlng, options);
-  var popupContent = "<p><b>Museum:</b> " + feature.properties.Name + "</p>";
-  var year = attribute.split("_")[1];
-  popupContent += "<p><b>Attendance in "+year+":</b> "+feature.properties[attribute]+"</p>";
+  var popupContent = "<p><b>City/Province/State:</b> " + feature.properties.Location + "</p>";
+  popupContent += "<p><b>Country or Region:</b> " + feature.properties.CountryRegion + "</p>";
+  var day = attribute[0];
+  popupContent += "<p><b>Cases in "+day+":</b> "+feature.properties[attribute]+"</p>";
   layer.bindPopup(popupContent, {
         offset: new L.Point(0,-options.radius)
     });
@@ -82,11 +82,29 @@ function createPropSymbols(data, attributes){
 function processData(data){
   var attributes = [];
   var properties = data.features[0].properties;
+  //console.log(properties)
   for (var attribute in properties){
-    if (attribute.indexOf("attendance_") > -1){
+    if (attribute.indexOf("1") > -1){
       attributes.push(attribute);
+    }else if (attribute.indexOf("2") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("3") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("4") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("5") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("6") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("7") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("8") > -1) {
+      attributes.push(attributes)
+    }else if (attribute.indexOf("9") > -1) {
+      attributes.push(attributes)
     }
   }
+  //console.log(attributes)
   return attributes;
 };
 function updatePropSymbols(attribute){
@@ -95,9 +113,11 @@ function updatePropSymbols(attribute){
       var props = layer.feature.properties;
       var radius = calcPropRadius(props[attribute]);
       layer.setRadius(radius);
-      var popupContent = "<p><b>Museum:</b> " + props.Name + "</p>";
-      var year = attribute.split("_")[1];
-      popupContent += "<p><b>Attendance in " + year + ":</b> " + props[attribute] + " people</p>";
+      var popupContent = "<p><b>City:</b> " + props.Location + "</p>";
+      popupContnet += "<p><b>Country or Region:</b> " + props.CountryRegion + "</p>"
+      var day = attribute[2];
+      //console.log(day)
+      popupContent += "<p><b>Cases in " + day + ":</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
     }
@@ -107,7 +127,7 @@ function createSequenceControls(attributes){
     //create range input element (slider)
     $("#panel").append('<input class="range-slider" type="range">');
     $('.range-slider').attr({
-        max: 6,
+        max: 38,
         min: 0,
         value: 0,
         step: 1
@@ -120,10 +140,10 @@ function createSequenceControls(attributes){
       var index = $('.range-slider').val();
       if ($(this).attr('id')=='forward'){
         index++;
-        index = index > 6 ? 0 :index;
+        index = index > 38 ? 0 :index;
       } else if ($(this).attr('id')=='reverse'){
         index--;
-        index = index < 0 ? 6 : index;
+        index = index < 0 ? 38 : index;
       };
       $('.range-slider').val(index);
       updatePropSymbols(attributes[index]);
@@ -137,7 +157,7 @@ function createSequenceControls(attributes){
 
 //Step 2: Import GeoJSON data
 function getData(mapid){
-    $.ajax("data/museumdatabase.geojson",{
+    $.ajax("data/coronacsv.geojson",{
       dataType: "json",
       success: function(response){
         var attributes = processData(response);

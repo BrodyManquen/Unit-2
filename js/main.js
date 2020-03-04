@@ -24,17 +24,16 @@ function calcMinValue(data){
       allValues.push(value);
     }
   }
-  console.log(allValues)
   var minValue = Math.min(...allValues)
   console.log(minValue)
-  return minValue
+  return minValue;
+  //console.log(minValue);
 };
 
 function calcPropRadius(attValue){
   console.log(minValue)
   var minRadius = 5
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
-  //console.log(allValues)
   //console.log(radius)
   return radius;
 };
@@ -88,7 +87,6 @@ function processData(data){
       attributes.push(attribute);
     }
   }
-  console.log(attributes);
   return attributes;
 };
 function updatePropSymbols(attribute){
@@ -128,8 +126,6 @@ function createSequenceControls(attributes){
         index = index < 0 ? 6 : index;
       };
       $('.range-slider').val(index);
-      console.log(index)
-      console.log(attributes[index])
       updatePropSymbols(attributes[index]);
     });
     $('.range-slider').on('input', function(){
@@ -145,7 +141,7 @@ function getData(mapid){
       dataType: "json",
       success: function(response){
         var attributes = processData(response);
-        calcMinValue(response);
+        minValue = calcMinValue(response);
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
       }

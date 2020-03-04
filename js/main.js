@@ -21,16 +21,21 @@ function calcMinValue(data){
   for(var museum of data.features){
     for(var year = 2012; year <=2017; year+=1){
       var value = museum.properties["attendance_" + String(year)];
-      allValues.push(value)
+      allValues.push(value);
     }
   }
+  console.log(allValues)
   var minValue = Math.min(...allValues)
+  console.log(minValue)
   return minValue
 };
 
 function calcPropRadius(attValue){
-  var minRadius = 6
-  var radius = 1.0083*Math.pow(attValue/minValue,0.5715)*minRadius
+  console.log(minValue)
+  var minRadius = 5
+  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+  //console.log(allValues)
+  //console.log(radius)
   return radius;
 };
 

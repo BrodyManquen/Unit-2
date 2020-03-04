@@ -21,16 +21,20 @@ function calcMinValue(data){
   for(var museum of data.features){
     for(var year = 2012; year <=2017; year+=1){
       var value = museum.properties["attendance_" + String(year)];
-      allValues.push(value)
+      allValues.push(value);
     }
   }
   var minValue = Math.min(...allValues)
-  return minValue
+  console.log(minValue)
+  return minValue;
+  //console.log(minValue);
 };
 
 function calcPropRadius(attValue){
-  var minRadius = 6
-  var radius = 1.0083*Math.pow(attValue/minValue,0.5715)*minRadius
+  console.log(minValue)
+  var minRadius = 5
+  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+  //console.log(radius)
   return radius;
 };
 
@@ -44,8 +48,9 @@ function onEachFeature(feature, layer){
   };
 };
 
-function pointToLayer(feature, latlng){
-  var attribute = "attendance_2012";
+function pointToLayer(feature, latlng, attributes){
+
+  var attribute = attributes[0];
   var options = {
     fillColor: "#ff7800",
     color: "#000",
@@ -65,16 +70,44 @@ function pointToLayer(feature, latlng){
   return layer;
 };
 
-function createPropSymbols(data, mapid){
+function createPropSymbols(data, attributes){
+
   L.geoJson(data, {
-    pointToLayer: pointToLayer
+    pointToLayer: function(feature, latlng){
+      return pointToLayer(feature, latlng, attributes);
+    }
   }).addTo(map);
 };
-function createSequenceControls(){
+
+function processData(data){
+  var attributes = [];
+  var properties = data.features[0].properties;
+  for (var attribute in properties){
+    if (attribute.indexOf("attendance_") > -1){
+      attributes.push(attribute);
+    }
+  }
+  return attributes;
+};
+function updatePropSymbols(attribute){
+  map.eachLayer(function(layer){
+    if (layer.feature && layer.feature.properties[attribute]){
+      var props = layer.feature.properties;
+      var radius = calcPropRadius(props[attribute]);
+      layer.setRadius(radius);
+      var popupContent = "<p><b>Museum:</b> " + props.Name + "</p>";
+      var year = attribute.split("_")[1];
+      popupContent += "<p><b>Attendance in " + year + ":</b> " + props[attribute] + " people</p>";
+      popup = layer.getPopup();
+      popup.setContent(popupContent).update();
+    }
+  })
+}
+function createSequenceControls(attributes){
     //create range input element (slider)
     $("#panel").append('<input class="range-slider" type="range">');
     $('.range-slider').attr({
-        max: 7,
+        max: 6,
         min: 0,
         value: 0,
         step: 1
@@ -83,17 +116,36 @@ function createSequenceControls(){
     $('#panel').append('<button class="step" id="forward">Forward</button>');
     $('#reverse').html('<img src="img/reverse.png">');
     $('#forward').html('<img src="img/forward.png">');
+    $('.step').click(function(){
+      var index = $('.range-slider').val();
+      if ($(this).attr('id')=='forward'){
+        index++;
+        index = index > 6 ? 0 :index;
+      } else if ($(this).attr('id')=='reverse'){
+        index--;
+        index = index < 0 ? 6 : index;
+      };
+      $('.range-slider').val(index);
+      updatePropSymbols(attributes[index]);
+    });
+    $('.range-slider').on('input', function(){
+      var index = $(this).val();
+      //updatePropSymbols(attributes[index]);
+      //console.log(index);
+    });
 };
 
 //Step 2: Import GeoJSON data
 function getData(mapid){
-    //load the data
-    $.getJSON("data/museumdatabase.geojson", function(response){
-            minValue = calcMinValue(response);
-            //call function to create proportional symbols
-            createPropSymbols(response);
-            createSequenceControls();
+    $.ajax("data/museumdatabase.geojson",{
+      dataType: "json",
+      success: function(response){
+        var attributes = processData(response);
+        minValue = calcMinValue(response);
+        createPropSymbols(response, attributes);
+        createSequenceControls(attributes);
+      }
     });
-};
+  };
 
 $(document).ready(createMap);

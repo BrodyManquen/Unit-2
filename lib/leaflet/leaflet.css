@@ -1,6 +1,6 @@
 /* required styles */
-#map {
-    height: 400px;
+#mapid {
+    height: 600px;
 }
 .leaflet-pane,
 .leaflet-tile,

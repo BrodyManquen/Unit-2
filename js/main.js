@@ -3,8 +3,8 @@ var minValue;
 
 function createMap(){
   map = L.map("mapid", {
-    center: [0, 0],
-    zoom: 2
+    center: [30.9756, 112.2707],
+    zoom: 5
   });
 
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
@@ -19,39 +19,26 @@ function createMap(){
 function calcMinValue(data){
   var allValues = [];
   for(var hub of data.features){
-    for(var day = 1; day <=38; day+=1){
+    for(var day = 1; day <=13; day+=1){
       var value = hub.properties[day];
       allValues.push(value);
-    }
-  }
-  var minValue = Math.min(...allValues)
-  console.log(minValue)
+    };
+  };
+  var minValue = Math.min(...allValues);
   return minValue;
-
 };
 
 function calcPropRadius(attValue){
-  var minRadius = 5
+  var minRadius = 1
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
-  //console.log(radius)
   return radius;
-};
-
-function onEachFeature(feature, layer){
-  var popupContent = "";
-  if (feature.properties){
-    for (var property in feature.properties){
-      popupContent += "<p>" + property + ":" + feature.properties[property]+"\n"+"</p";
-    }
-    layer.bindPopup(popupContent);
-  };
 };
 
 function pointToLayer(feature, latlng, attributes){
 
   var attribute = attributes[0];
   var options = {
-    fillColor: "#ff7800",
+    fillColor: "#FD5555",
     color: "#000",
     weight: 1,
     opacity: 1,
@@ -61,7 +48,7 @@ function pointToLayer(feature, latlng, attributes){
   options.radius = calcPropRadius(attValue);
   var layer = L.circleMarker(latlng, options);
   var popupContent = "<p><b>City/Province/State:</b> " + feature.properties.Location + "</p>";
-  popupContent += "<p><b>Country or Region:</b> " + feature.properties.CountryRegion + "</p>";
+  popupContent += "<p><b>Region:</b> " + feature.properties.Region + "</p>";
   var day = attribute[0];
   popupContent += "<p><b>Cases in "+day+":</b> "+feature.properties[attribute]+"</p>";
   layer.bindPopup(popupContent, {
@@ -82,7 +69,6 @@ function createPropSymbols(data, attributes){
 function processData(data){
   var attributes = [];
   var properties = data.features[0].properties;
-  //console.log(properties)
   for (var attribute in properties){
     if (attribute.indexOf("1") > -1){
       attributes.push(attribute);
@@ -102,9 +88,8 @@ function processData(data){
       attributes.push(attributes)
     }else if (attribute.indexOf("9") > -1) {
       attributes.push(attributes)
-    }
-  }
-  //console.log(attributes)
+    };
+  };
   return attributes;
 };
 function updatePropSymbols(attribute){
@@ -113,11 +98,11 @@ function updatePropSymbols(attribute){
       var props = layer.feature.properties;
       var radius = calcPropRadius(props[attribute]);
       layer.setRadius(radius);
-      var popupContent = "<p><b>City:</b> " + props.Location + "</p>";
-      popupContnet += "<p><b>Country or Region:</b> " + props.CountryRegion + "</p>"
+      var popupContent = "<p><b>City/Province:</b> " + props.Location + "</p>";
+      popupContent += "<p><b>Region/Country:</b> " + props.Region + "</p>"
       var day = attribute[2];
       //console.log(day)
-      popupContent += "<p><b>Cases in " + day + ":</b> " + props[attribute] + " people</p>";
+      popupContent += "<p><b>COVID-19 cases in :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
     }
@@ -127,7 +112,7 @@ function createSequenceControls(attributes){
     //create range input element (slider)
     $("#panel").append('<input class="range-slider" type="range">');
     $('.range-slider').attr({
-        max: 38,
+        max: 13,
         min: 0,
         value: 0,
         step: 1
@@ -140,24 +125,23 @@ function createSequenceControls(attributes){
       var index = $('.range-slider').val();
       if ($(this).attr('id')=='forward'){
         index++;
-        index = index > 38 ? 0 :index;
+        index = index > 13 ? 0 :index;
       } else if ($(this).attr('id')=='reverse'){
         index--;
-        index = index < 0 ? 38 : index;
+        index = index < 0 ? 13 : index;
       };
       $('.range-slider').val(index);
-      updatePropSymbols(attributes[index]);
+      updatePropSymbols(attributes[index])
+      console.log(attributes[index])
     });
     $('.range-slider').on('input', function(){
       var index = $(this).val();
-      //updatePropSymbols(attributes[index]);
-      //console.log(index);
     });
 };
 
 //Step 2: Import GeoJSON data
 function getData(mapid){
-    $.ajax("data/coronacsv.geojson",{
+    $.ajax("data/chinaCorona.geojson",{
       dataType: "json",
       success: function(response){
         var attributes = processData(response);

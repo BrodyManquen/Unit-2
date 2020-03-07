@@ -42,7 +42,7 @@ function pointToLayer(feature, latlng, attributes){
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.8
+    fillOpacity: 0.79
   };
   var attValue = Number(feature.properties[attribute]);
   options.radius = calcPropRadius(attValue);

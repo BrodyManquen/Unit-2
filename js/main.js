@@ -1,21 +1,43 @@
 var map;
 var minValue;
 
-function createMap(){
-  map = L.map("mapid", {
-    center: [30.9756, 112.2707],
-    zoom: 5
-  });
-
-  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      maxZoom: 18,
-      id: 'mapbox/streets-v11',
-      accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
-  }).addTo(map);
-  getData();
+function processData(data){
+  var attributes = [];
+  var properties = data.features[0].properties;
+  for (var attribute in properties){
+    if (attribute.indexOf("1") > -1){
+      attributes.push(attribute);
+    }else if (attribute.indexOf("2") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("3") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("4") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("5") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("6") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("7") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("8") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("9") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("10") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("11") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("12") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("13") > -1) {
+      attributes.push(attribute)
+    }else if (attribute.indexOf("14") > -1) {
+      attributes.push(attribute)
+    };
+  };
+  return attributes;
 };
-//days start on Jan 22 2020 (01-22-2020)
+
 function calcMinValue(data){
   var allValues = [];
   for(var hub of data.features){
@@ -28,21 +50,23 @@ function calcMinValue(data){
   return minValue;
 };
 
-function calcPropRadius(attValue){
-  var minRadius = 1
-  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
-  return radius;
+function createPropSymbols(data, attributes){
+
+  L.geoJson(data, {
+    pointToLayer: function(feature, latlng){
+      return pointToLayer(feature, latlng, attributes);
+    }
+  }).addTo(map);
 };
 
 function pointToLayer(feature, latlng, attributes){
-
   var attribute = attributes[0];
   var options = {
     fillColor: "#FD5555",
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.79
+    fillOpacity: 0.8
   };
   var attValue = Number(feature.properties[attribute]);
   options.radius = calcPropRadius(attValue);
@@ -57,59 +81,13 @@ function pointToLayer(feature, latlng, attributes){
   return layer;
 };
 
-function createPropSymbols(data, attributes){
-
-  L.geoJson(data, {
-    pointToLayer: function(feature, latlng){
-      return pointToLayer(feature, latlng, attributes);
-    }
-  }).addTo(map);
+function calcPropRadius(attValue){
+  var minRadius = 4
+  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+  return radius;
 };
 
-function processData(data){
-  var attributes = [];
-  var properties = data.features[0].properties;
-  for (var attribute in properties){
-    if (attribute.indexOf("1") > -1){
-      attributes.push(attribute);
-    }else if (attribute.indexOf("2") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("3") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("4") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("5") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("6") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("7") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("8") > -1) {
-      attributes.push(attributes)
-    }else if (attribute.indexOf("9") > -1) {
-      attributes.push(attributes)
-    };
-  };
-  return attributes;
-};
-function updatePropSymbols(attribute){
-  map.eachLayer(function(layer){
-    if (layer.feature && layer.feature.properties[attribute]){
-      var props = layer.feature.properties;
-      var radius = calcPropRadius(props[attribute]);
-      layer.setRadius(radius);
-      var popupContent = "<p><b>City/Province:</b> " + props.Location + "</p>";
-      popupContent += "<p><b>Region/Country:</b> " + props.Region + "</p>"
-      var day = attribute[2];
-      //console.log(day)
-      popupContent += "<p><b>COVID-19 cases in :</b> " + props[attribute] + " people</p>";
-      popup = layer.getPopup();
-      popup.setContent(popupContent).update();
-    }
-  })
-}
 function createSequenceControls(attributes){
-    //create range input element (slider)
     $("#panel").append('<input class="range-slider" type="range">');
     $('.range-slider').attr({
         max: 13,
@@ -132,6 +110,8 @@ function createSequenceControls(attributes){
       };
       $('.range-slider').val(index);
       updatePropSymbols(attributes[index])
+      console.log(index)
+      console.log("Slider Control: ")
       console.log(attributes[index])
     });
     $('.range-slider').on('input', function(){
@@ -139,7 +119,39 @@ function createSequenceControls(attributes){
     });
 };
 
-//Step 2: Import GeoJSON data
+function updatePropSymbols(attribute){
+  map.eachLayer(function(layer){
+    if (layer.feature && layer.feature.properties[attribute]){
+      var props = layer.feature.properties;
+      var radius = calcPropRadius(props[attribute]);
+      layer.setRadius(radius);
+      var popupContent = "<p><b>City/Province:</b> " + props.Location + "</p>";
+      popupContent += "<p><b>Region/Country:</b> " + props.Region + "</p>"
+      console.log('Update prop symbol: '+ attribute)
+      var day = attribute[2];
+      popupContent += "<p><b>COVID-19 cases in :</b> " + props[attribute] + " people</p>";
+      popup = layer.getPopup();
+      popup.setContent(popupContent).update();
+    }
+  })
+}
+
+function createMap(){
+  map = L.map("mapid", {
+    center: [30.9756, 112.2707],
+    zoom: 5
+  });
+  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 18,
+      id: 'mapbox/streets-v11',
+      accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
+  }).addTo(map);
+  getData();
+};
+
+//Add non-scalable
+
 function getData(mapid){
     $.ajax("data/chinaCorona.geojson",{
       dataType: "json",

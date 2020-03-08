@@ -1,0 +1,29 @@
+{
+   "type": "FeatureCollection",
+   "features": [
+     {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates":  [ 112.2707,30.9756 ]
+      },
+      "properties": {
+        "Location":"Hubei",
+        "Region":"Mainland China",
+        "1":761,
+        "2":1058,
+        "3":1423,
+        "4":3554,
+        "5":3554,
+        "6":4903,
+        "7":5806,
+        "8":7153,
+        "9":11177,
+        "10":13522,
+        "11":16678,
+        "12":19665,
+        "13":22112,
+        "14":24953
+      }
+    }]
+  }

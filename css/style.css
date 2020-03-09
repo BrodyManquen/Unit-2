@@ -17,6 +17,15 @@
   text-align: center;
   border: solid gray 1px;
 }
+.legend-control-container{
+  width: 350px;
+  height: 30px;
+  background-color: rgba(255,255,255,0.8);
+  padding: 10px;
+  line-height: 45px;
+  text-align: center;
+  border: solid gray 1px;
+}
 .range-slider {
   width: 250px;
 }
@@ -26,17 +35,18 @@
 }
 
 .step img {
-	width: 100%
+	width: 100%;
   height: auto;
 }
 
-
 #forward {
     float: right;
+    width: 40px;
 }
 
 #reverse {
     float: left;
+    width: 40px;
 }
 #description {
   width: 75%;

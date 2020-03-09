@@ -95,57 +95,90 @@ function createSequenceControls(attributes){
     onAdd: function() {
       var container = L.DomUtil.create('div', 'sequence-control-container');
       $(container).append('<input class="range-slider" type="range">');
-      $(container).append('<button class="step" id="reverse" title="Reverse">Reverse</button>');
-      $(container).append('<button class="step" id="forward" title="Forward">Forward</button>');
-      $('reverse').html('<img src="img/reverse.png">');
-      $('forward').html('<img src="img/forward.png">');
-      // $('.step').click(function(){
-      //       var index = $('.range-slider').val();
-      //       if ($(this).attr('id')=='forward'){
-      //         index++;
-      //         index = index > 13 ? 0 :index;
-      //       } else if ($(this).attr('id')=='reverse'){
-      //         index--;
-      //         index = index < 0 ? 13 : index;
-      //       };
-      //       $('.range-slider').val(index);
-      //       updatePropSymbols(attributes[index])
-      //       console.log(index)
+      $(container).append('<button class="step" id="reverse" img src = "img/reverse.png" title="Reverse">Reverse</button>');
+      $(container).append('<button class="step" id="forward" img src = "img/forward.png" title="Forward">Forward</button>');
+      L.DomEvent.disableClickPropagation(container);
       return container;
     }
   });
   map.addControl(new SequenceControl());
+  $(reverse).html('<img src="img/reverse.png">');
+  $(forward).html('<img src="img/forward.png">');
+  $('.range-slider').attr({
+    max: 13,
+    min: 0,
+    value: 0,
+    step: 1
+  });
+  $('.step').click(function(){
+    var index = $('.range-slider').val();
+    if ($(this).attr('id')=='forward'){
+      index++;
+      index = index > 13 ? 0 :index;
+    }else if ($(this).attr('id')=='reverse'){
+      index--;
+      index = index < 0 ? 13 : index;
+    };
+    $('.range-slider').val(index);
+    updatePropSymbols(attributes[index])
+  });
+  $('.range-slider').click(function(){
+    var index = $('.range-slider').val();
+    updatePropSymbols(attributes[index])
+  })
+  createLegend()
 }
-//     $("#panel").append('<input class="range-slider" type="range">');
-//     $('.range-slider').attr({
-//         max: 13,
-//         min: 0,
-//         value: 0,
-//         step: 1
-//     });
-//     $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-//     $('#panel').append('<button class="step" id="forward">Forward</button>');
-//     $('#reverse').html('<img src="img/reverse.png">');
-//     $('#forward').html('<img src="img/forward.png">');
-//     $('.step').click(function(){
-//       var index = $('.range-slider').val();
-//       if ($(this).attr('id')=='forward'){
-//         index++;
-//         index = index > 13 ? 0 :index;
-//       } else if ($(this).attr('id')=='reverse'){
-//         index--;
-//         index = index < 0 ? 13 : index;
-//       };
-//       $('.range-slider').val(index);
-//       updatePropSymbols(attributes[index])
-//       console.log(index)
-//
-//     });
-//     $('.range-slider').on('input', function(){
-//       var index = $(this).val()
-//       updatePropSymbols(attributes[index]);
-//     });
-// };
+
+function createLegend(attributes){
+    var LegendControl = L.Control.extend({
+        options: {
+            position: 'bottomright'
+        },
+        onAdd: function () {
+            // create the control container with a particular class name
+            var index = $('.range-slider').val();
+            var container = L.DomUtil.create('div', 'legend-control-container');
+            if (index == 0){
+              var date = "1/25/2020";
+            }else if (index == 1) {
+              var date = "1/26/2020"
+            }else if (index == 2) {
+              var date = "1/27/2020"
+            }else if (index == 3) {
+              var date = "1/28/2020"
+            }else if (index == 4) {
+              var date = "1/29/2020"
+            }else if (index == 5) {
+              var date = "1/30/2020"
+            }else if (index == 6) {
+              var date = "1/31/2020"
+            }else if (index == 7) {
+              var date = "2/1/2020"
+            }else if (index == 8) {
+              var date = "2/2/2020"
+            }else if (index == 9) {
+              var date = "2/3/2020"
+            }else if (index == 10) {
+              var date = "2/4/2020"
+            }else if (index == 11) {
+              var date = "2/5/2020"
+            }else if (index == 12) {
+              var date = "2/6/2020"
+            }else if(index == 13) {
+              var date = "2/7/2020"
+            };
+            var legendContent = "<p><b>Reported COVID-19 (Coronavirus) cases on " + date + "</b></p>";
+            console.log(legendContent)
+            return container;
+            return legendContent;
+            $('legend-control-container').append(legendContent);
+        }
+
+    });
+
+    map.addControl(new LegendControl());
+};
+
 function addDescript(){
   $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in Mainland China outside of Hubei Province (1/25/2020 - 2/7/2020)</p></b>')
 }
@@ -162,8 +195,9 @@ function updatePropSymbols(attribute){
       popupContent += "<p><b>COVID-19 cases :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
-    }
+      }
   })
+createLegend()
 }
 
 function createMap(){
@@ -172,7 +206,7 @@ function createMap(){
     zoom: 5
   });
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      attribution: 'Map data &copy; <a href="https://systems.jhu.edu/research/public-health/ncov/">Mapping 2019-nCoV Johns Hopkins CSSE</a> <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
       maxZoom: 18,
       id: 'mapbox/streets-v11',
       accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'

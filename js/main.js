@@ -71,10 +71,10 @@ function pointToLayer(feature, latlng, attributes){
   var attValue = Number(feature.properties[attribute]);
   options.radius = calcPropRadius(attValue);
   var layer = L.circleMarker(latlng, options);
-  var popupContent = "<p><b>City/Province/State:</b> " + feature.properties.Location + "</p>";
-  popupContent += "<p><b>Region:</b> " + feature.properties.Region + "</p>";
+  var popupContent = "<p><b>City/Province:</b> " + feature.properties.Location + "</p>";
+  popupContent += "<p><b>Region/Country:</b> " + feature.properties.Region + "</p>";
   var day = attribute[0];
-  popupContent += "<p><b>Cases in "+day+":</b> "+feature.properties[attribute]+"</p>";
+  popupContent += "<p><b>COVID-19 cases :</b> "+feature.properties[attribute]+" people</p>";
   layer.bindPopup(popupContent, {
         offset: new L.Point(0,-options.radius)
     });
@@ -88,37 +88,67 @@ function calcPropRadius(attValue){
 };
 
 function createSequenceControls(attributes){
-    $("#panel").append('<input class="range-slider" type="range">');
-    $('.range-slider').attr({
-        max: 13,
-        min: 0,
-        value: 0,
-        step: 1
-    });
-    $('#panel').append('<button class="step" id="reverse">Reverse</button>');
-    $('#panel').append('<button class="step" id="forward">Forward</button>');
-    $('#reverse').html('<img src="img/reverse.png">');
-    $('#forward').html('<img src="img/forward.png">');
-    $('.step').click(function(){
-      var index = $('.range-slider').val();
-      if ($(this).attr('id')=='forward'){
-        index++;
-        index = index > 13 ? 0 :index;
-      } else if ($(this).attr('id')=='reverse'){
-        index--;
-        index = index < 0 ? 13 : index;
-      };
-      $('.range-slider').val(index);
-      updatePropSymbols(attributes[index])
-      console.log(index)
-      console.log("Slider Control: ")
-      console.log(attributes[index])
-    });
-    $('.range-slider').on('input', function(){
-      var index = $(this).val();
-    });
-};
-
+  var SequenceControl = L.Control.extend({
+    options: {
+      position: 'bottomleft'
+    },
+    onAdd: function() {
+      var container = L.DomUtil.create('div', 'sequence-control-container');
+      $(container).append('<input class="range-slider" type="range">');
+      $(container).append('<button class="step" id="reverse" title="Reverse">Reverse</button>');
+      $(container).append('<button class="step" id="forward" title="Forward">Forward</button>');
+      $('reverse').html('<img src="img/reverse.png">');
+      $('forward').html('<img src="img/forward.png">');
+      // $('.step').click(function(){
+      //       var index = $('.range-slider').val();
+      //       if ($(this).attr('id')=='forward'){
+      //         index++;
+      //         index = index > 13 ? 0 :index;
+      //       } else if ($(this).attr('id')=='reverse'){
+      //         index--;
+      //         index = index < 0 ? 13 : index;
+      //       };
+      //       $('.range-slider').val(index);
+      //       updatePropSymbols(attributes[index])
+      //       console.log(index)
+      return container;
+    }
+  });
+  map.addControl(new SequenceControl());
+}
+//     $("#panel").append('<input class="range-slider" type="range">');
+//     $('.range-slider').attr({
+//         max: 13,
+//         min: 0,
+//         value: 0,
+//         step: 1
+//     });
+//     $('#panel').append('<button class="step" id="reverse">Reverse</button>');
+//     $('#panel').append('<button class="step" id="forward">Forward</button>');
+//     $('#reverse').html('<img src="img/reverse.png">');
+//     $('#forward').html('<img src="img/forward.png">');
+//     $('.step').click(function(){
+//       var index = $('.range-slider').val();
+//       if ($(this).attr('id')=='forward'){
+//         index++;
+//         index = index > 13 ? 0 :index;
+//       } else if ($(this).attr('id')=='reverse'){
+//         index--;
+//         index = index < 0 ? 13 : index;
+//       };
+//       $('.range-slider').val(index);
+//       updatePropSymbols(attributes[index])
+//       console.log(index)
+//
+//     });
+//     $('.range-slider').on('input', function(){
+//       var index = $(this).val()
+//       updatePropSymbols(attributes[index]);
+//     });
+// };
+function addDescript(){
+  $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in Mainland China outside of Hubei Province (1/25/2020 - 2/7/2020)</p></b>')
+}
 function updatePropSymbols(attribute){
   map.eachLayer(function(layer){
     if (layer.feature && layer.feature.properties[attribute]){
@@ -129,7 +159,7 @@ function updatePropSymbols(attribute){
       popupContent += "<p><b>Region/Country:</b> " + props.Region + "</p>"
       console.log('Update prop symbol: '+ attribute)
       var day = attribute[2];
-      popupContent += "<p><b>COVID-19 cases in :</b> " + props[attribute] + " people</p>";
+      popupContent += "<p><b>COVID-19 cases :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
     }
@@ -151,6 +181,16 @@ function createMap(){
 };
 
 //Add non-scalable
+function wuhan(){
+  var circle = L.circle([30.583332, 114.283333],{
+    fillColor: "#FD5555",
+    color: "#000",
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8,
+    radius: 500
+  }).addTo(map);
+};
 
 function getData(mapid){
     $.ajax("data/chinaCorona.geojson",{
@@ -160,6 +200,7 @@ function getData(mapid){
         minValue = calcMinValue(response);
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
+        addDescript();
       }
     });
   };

@@ -84,13 +84,11 @@ function pointToLayer(feature, latlng, attributes){
     });
   return layer;
 };
-
 function calcPropRadius(attValue){
   var minRadius = 4.5
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
   return radius;
 };
-
 function createSequenceControls(attributes){
   var SequenceControl = L.Control.extend({
     options: {
@@ -132,17 +130,17 @@ function createSequenceControls(attributes){
   })
   createLegend()
 }
-
 function createLegend(attributes){
     var LegendControl = L.Control.extend({
         options: {
             position: 'bottomright'
         },
-        onAdd: function (map) {
-            map.legend = this;
+        onAdd: function () {
             // create the control container with a particular class name
             var index = $('.range-slider').val();
-            var container = L.DomUtil.create('div', 'legend-control-container');
+            var legend = L.DomUtil.create('div', 'legend-control-container');
+            var temporal = '<div class="temporalLegend" width="160px" height="60px">';
+            $(legend).append(temporal);
             if (index == 0){
               var date = "1/25/2020";
             }else if (index == 1) {
@@ -173,10 +171,9 @@ function createLegend(attributes){
               var date = "2/7/2020"
             };
             var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
-            $(container).append (legendContent);
-
+            $(legend).append(legendContent);
             //Attribute Legend
-            var svg = '<svg id="attribute-legend" width="160px" height="60px">';
+            var svg = '<svg class="attribute-legend" width="200px" height="100px">';
             var circles = ['max', 'mean', 'min'];
             for (var i=0; i<circles.length; i++){
               var radius = calcPropRadius(dataStats[circles[i]]);
@@ -184,18 +181,56 @@ function createLegend(attributes){
               svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#F47821" fill-opacity="0.8" stroke="#000000" cx="30"/>';
             };
             svg += "</svg>"
-            $(container).append(svg)
-            return container;
+            $(legend).append(svg)
+            return(legend);
+            //return(legendContent);
             //return legendContent;
         },
-        onRemove: function(map){
-          delete container
+        onRemove: function(){
+          delete legend
         }
     });
-    map.addControl(new LegendControl());
-    return LegendControl
-};
 
+    map.addControl(new LegendControl());
+};
+function updateLegend(legend){
+
+  // var legend = L.DomUtil.create('div', 'legend-control-container');
+  // var index = $('.range-slider').val();
+  // if (index == 0){
+  //   var date = "1/25/2020";
+  // }else if (index == 1) {
+  //   var date = "1/26/2020"
+  // }else if (index == 2) {
+  //   var date = "1/27/2020"
+  // }else if (index == 3) {
+  //   var date = "1/28/2020"
+  // }else if (index == 4) {
+  //   var date = "1/29/2020"
+  // }else if (index == 5) {
+  //   var date = "1/30/2020"
+  // }else if (index == 6) {
+  //   var date = "1/31/2020"
+  // }else if (index == 7) {
+  //   var date = "2/1/2020"
+  // }else if (index == 8) {
+  //   var date = "2/2/2020"
+  // }else if (index == 9) {
+  //   var date = "2/3/2020"
+  // }else if (index == 10) {
+  //   var date = "2/4/2020"
+  // }else if (index == 11) {
+  //   var date = "2/5/2020"
+  // }else if (index == 12) {
+  //   var date = "2/6/2020"
+  // }else if(index == 13) {
+  //   var date = "2/7/2020"
+  // };
+  // var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
+  // $(legend).append(legendContent);
+  // legend.addTo(map)
+  // return legend
+}
 function addDescript(){
   $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in selected Mainland Chinese provinces outside of Hubei (1/25/2020 - 2/7/2020)</p></b>')
 }
@@ -211,11 +246,11 @@ function updatePropSymbols(attribute){
       popupContent += "<p><b>COVID-19 cases :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
-      }
-  })
-createLegend()
-}
+    };
 
+  })
+createLegend();
+};
 function createMap(){
   map = L.map("mapid", {
     center: [30.9756, 112.2707],
@@ -229,19 +264,6 @@ function createMap(){
   }).addTo(map);
   getData();
 };
-
-//Add non-scalable
-function wuhan(){
-  var circle = L.circle([30.583332, 114.283333],{
-    fillColor: "#FD5555",
-    color: "#000",
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8,
-    radius: 500
-  }).addTo(map);
-};
-
 function getData(mapid){
     $.ajax("data/chinaCorona.geojson",{
       dataType: "json",

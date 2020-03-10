@@ -167,13 +167,14 @@ function createLegend(attributes){
             }else if(index == 13) {
               var date = "2/7/2020"
             };
+            $(container).append ("<p><b>Reported COVID-19 (Coronavirus) cases on " + date + "</b></p>");
             var legendContent = "<p><b>Reported COVID-19 (Coronavirus) cases on " + date + "</b></p>";
-            console.log(legendContent)
             return container;
             return legendContent;
-            $('legend-control-container').append(legendContent);
-        }
 
+            console.log(legendContent)
+            return div;
+        }
     });
 
     map.addControl(new LegendControl());

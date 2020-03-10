@@ -1,5 +1,5 @@
 var map;
-var minValue;
+var dataStats = {};
 
 function processData(data){
   var attributes = [];
@@ -38,7 +38,7 @@ function processData(data){
   return attributes;
 };
 
-function calcMinValue(data){
+function calcStats(data){
   var allValues = [];
   for(var hub of data.features){
     for(var day = 1; day <=13; day+=1){
@@ -46,7 +46,11 @@ function calcMinValue(data){
       allValues.push(value);
     };
   };
+  dataStats.min = Math.min(...allValues);
+  dataStats.max = Math.max(...allValues);
   var minValue = Math.min(...allValues);
+  var sum = allValues.reduce(function(a, b){return a+b});
+  dataStats.mean = sum/allValues.length;
   return minValue;
 };
 
@@ -82,7 +86,7 @@ function pointToLayer(feature, latlng, attributes){
 };
 
 function calcPropRadius(attValue){
-  var minRadius = 4
+  var minRadius = 4.5
   var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
   return radius;
 };
@@ -134,7 +138,8 @@ function createLegend(attributes){
         options: {
             position: 'bottomright'
         },
-        onAdd: function () {
+        onAdd: function (map) {
+            map.legend = this;
             // create the control container with a particular class name
             var index = $('.range-slider').val();
             var container = L.DomUtil.create('div', 'legend-control-container');
@@ -167,21 +172,32 @@ function createLegend(attributes){
             }else if(index == 13) {
               var date = "2/7/2020"
             };
-            $(container).append ("<p><b>Reported COVID-19 (Coronavirus) cases on " + date + "</b></p>");
-            var legendContent = "<p><b>Reported COVID-19 (Coronavirus) cases on " + date + "</b></p>";
-            return container;
-            return legendContent;
+            var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
+            $(container).append (legendContent);
 
-            console.log(legendContent)
-            return div;
+            //Attribute Legend
+            var svg = '<svg id="attribute-legend" width="160px" height="60px">';
+            var circles = ['max', 'mean', 'min'];
+            for (var i=0; i<circles.length; i++){
+              var radius = calcPropRadius(dataStats[circles[i]]);
+              var cy = 59 - radius;
+              svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#F47821" fill-opacity="0.8" stroke="#000000" cx="30"/>';
+            };
+            svg += "</svg>"
+            $(container).append(svg)
+            return container;
+            //return legendContent;
+        },
+        onRemove: function(map){
+          delete container
         }
     });
-
     map.addControl(new LegendControl());
+    return LegendControl
 };
 
 function addDescript(){
-  $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in Mainland China outside of Hubei Province (1/25/2020 - 2/7/2020)</p></b>')
+  $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in selected Mainland Chinese provinces outside of Hubei (1/25/2020 - 2/7/2020)</p></b>')
 }
 function updatePropSymbols(attribute){
   map.eachLayer(function(layer){
@@ -191,7 +207,6 @@ function updatePropSymbols(attribute){
       layer.setRadius(radius);
       var popupContent = "<p><b>City/Province:</b> " + props.Location + "</p>";
       popupContent += "<p><b>Region/Country:</b> " + props.Region + "</p>"
-      console.log('Update prop symbol: '+ attribute)
       var day = attribute[2];
       popupContent += "<p><b>COVID-19 cases :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
@@ -232,7 +247,7 @@ function getData(mapid){
       dataType: "json",
       success: function(response){
         var attributes = processData(response);
-        minValue = calcMinValue(response);
+        minValue = calcStats(response);
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
         addDescript();

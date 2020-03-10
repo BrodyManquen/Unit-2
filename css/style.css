@@ -18,13 +18,21 @@
   border: solid gray 1px;
 }
 .legend-control-container{
-  width: 350px;
-  height: 30px;
+  width: 250px;
+  height: 150px;
   background-color: rgba(255,255,255,0.8);
   padding: 10px;
-  line-height: 45px;
+  line-height: 0px;
   text-align: center;
   border: solid gray 1px;
+}
+.attribute-legend{
+  width: 200px;
+  height: 100px;
+}
+.temporalLegend{
+  width: 160px;
+  height: 60px;
 }
 .range-slider {
   width: 250px;

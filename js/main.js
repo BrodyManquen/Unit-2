@@ -46,11 +46,11 @@ function calcStats(data){  //calculates Statistics
       allValues.push(value);
     };
   };
-  dataStats.min = Math.min(...allValues);
-  dataStats.max = Math.max(...allValues);  //Performs summary statistics on allValues
+  dataStats.min = Math.round(Math.min(...allValues));  //rounds values because these are People, can have decimals
+  dataStats.max = Math.round(Math.max(...allValues));  //Performs summary statistics on allValues
   //var minValue = Math.min(...allValues);
   var sum = allValues.reduce(function(a, b){return a+b});
-  dataStats.mean = sum/allValues.length;
+  dataStats.mean = Math.round(sum/allValues.length);
   //return minValue;
 };
 
@@ -132,7 +132,7 @@ function createSequenceControls(attributes){  //creates Sequence Bar
     var index = $('.range-slider').val();
     updatePropSymbols(attributes[index])
   })
-  createLegend(); //creates legend for initial timestamp
+  updateLegend(); //creates legend for initial timestamp
 }
 
 function createLegend(attributes){
@@ -197,22 +197,15 @@ function createLegend(attributes){
     map.addControl(new LegendControl());
   }
 
-function updateLegend(){   /////Currently, is the same as createLegend because I cannot figure out how to
-  var LegendControl = L.Control.extend({   //update the legend without either A. causing multiple legends to appear or
-      options: {                          // B. stop the legend from updating altogether -- unsure how to fix this
-          position: 'bottomright'
-      },
-      onAdd: function () {
-        map.legend = this;
-
-          // create the control container with a particular class name
+function updateLegend(){   /////similar to createLegend code but doesnt create new divs/containers, but alters contents of current
+  var LegendControl = L.Control.extend({
+        options: {
+            position: 'bottomright' //places in bottom right
+        },
+        onAdd: function(){
           var index = $('.range-slider').val();
-          var legend = L.DomUtil.create('div', 'legend-control-container');
-          //LegendControl.removeFrom(map);
-          var temporal = '<div class="temporalLegend" width="250px" height="15px">';
-          $(legend).append(temporal);
           if (index == 0){
-            var date = "1/25/2020";
+            var date = "1/25/2020"; // gets date names for each Index, as name in GEOJson not helpful
           }else if (index == 1) {
             var date = "1/26/2020"
           }else if (index == 2) {
@@ -240,32 +233,26 @@ function updateLegend(){   /////Currently, is the same as createLegend because I
           }else if(index == 13) {
             var date = "2/7/2020"
           };
-          var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
-          var temporalContent = $('div.temporalLegend').html(legendContent);
-
-          //Attribute Legend
-          var svg = '<svg class="attribute-legend" width="200px" height="130px">';
+          var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>"; //sets temporalLegend name
+          var updatedLegend = $('div.temporalLegend').html(legendContent)
+          var svg = '<svg class="attribute-legend" width="130px" height="130px">'; //svg legend info
           var circles = ['max', 'mean', 'min'];
-          for (var i=0; i<circles.length; i++){
-            var radius = calcPropRadius(dataStats[circles[i]]);
-            var cy = 129 - radius;
-            svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
+          for (var i=0; i<circles.length; i++){ //grabs max, mean, min to add as svg legend elements
+            var radius = calcPropRadius(dataStats[circles[i]]); //grabs radius of max, mean, min
+            var cy = 129 - radius; //sets y position of circles in legend
+            svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>'; //adds svg to legend
             var textY = i*20+80;
-            svg += '<text id="'+circles[i]+'-text" x="125" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+"people"+'</text>'
-            };
-          svg += "</svg>"
+            svg += '<text id="'+circles[i]+'-text" x="125" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+" people"+'</text>' //adds svg labels to legend
+          };
+          svg += "</svg>" //closes svg
           var svgLegend = $("div.legend-control-container").append(svg)
-          return(legend);
-      },
-      onRemove: function(){
-        console.log('pie jesu domine')
-      }
-  });
-
-  map.addControl(new LegendControl());
-};
+        }
+      });
+      map.addControl(new LegendControl());
+    }
 
 function addDescript(){ //adds title
+  console.log('hello')
   $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in selected Mainland Chinese provinces outside of Hubei (1/25/2020 - 2/7/2020)</p></b>')
 }
 
@@ -315,9 +302,9 @@ function getData(mapid){  //data calculation
       success: function(response){
         var attributes = processData(response); //runs through scripts
         calcStats(response);
+        addDescript();
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
-        addDescript();
       }
     });
   };

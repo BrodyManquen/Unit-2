@@ -27,9 +27,9 @@
   border: solid gray 1px;
 }
 .attribute-legend{
-  width: 130px;
+  width: 200px;
   height: 130px;
-  text-align: center;
+  text-align: right;
 }
 .temporalLegend{
   width: 250px;

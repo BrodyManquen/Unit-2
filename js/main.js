@@ -1,5 +1,6 @@
 var map;
 var dataStats = {};
+var legend = L.DomUtil.create('div', 'legend-control-container');
 
 function processData(data){
   var attributes = [];
@@ -48,10 +49,10 @@ function calcStats(data){
   };
   dataStats.min = Math.min(...allValues);
   dataStats.max = Math.max(...allValues);
-  var minValue = Math.min(...allValues);
+  //var minValue = Math.min(...allValues);
   var sum = allValues.reduce(function(a, b){return a+b});
   dataStats.mean = sum/allValues.length;
-  return minValue;
+  //return minValue;
 };
 
 function createPropSymbols(data, attributes){
@@ -86,7 +87,7 @@ function pointToLayer(feature, latlng, attributes){
 };
 function calcPropRadius(attValue){
   var minRadius = 4.5
-  var radius = 1.0083 * Math.pow(attValue/minValue,0.5715) * minRadius
+  var radius = 1.0083 * Math.pow(attValue/dataStats.min,0.5715) * minRadius
   return radius;
 };
 function createSequenceControls(attributes){
@@ -128,7 +129,8 @@ function createSequenceControls(attributes){
     var index = $('.range-slider').val();
     updatePropSymbols(attributes[index])
   })
-  createLegend()
+
+  createLegend();
 }
 function createLegend(attributes){
     var LegendControl = L.Control.extend({
@@ -139,7 +141,7 @@ function createLegend(attributes){
             // create the control container with a particular class name
             var index = $('.range-slider').val();
             var legend = L.DomUtil.create('div', 'legend-control-container');
-            var temporal = '<div class="temporalLegend" width="160px" height="60px">';
+            var temporal = '<div class="temporalLegend" width="250px" height="15px">';
             $(legend).append(temporal);
             if (index == 0){
               var date = "1/25/2020";
@@ -171,17 +173,17 @@ function createLegend(attributes){
               var date = "2/7/2020"
             };
             var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
-            $(legend).append(legendContent);
+            var temporalContent = $('div.temporalLegend').append(legendContent);
             //Attribute Legend
-            var svg = '<svg class="attribute-legend" width="200px" height="100px">';
+            var svg = '<svg class="attribute-legend" width="200px" height="200px">';
             var circles = ['max', 'mean', 'min'];
             for (var i=0; i<circles.length; i++){
               var radius = calcPropRadius(dataStats[circles[i]]);
               var cy = 59 - radius;
-              svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#F47821" fill-opacity="0.8" stroke="#000000" cx="30"/>';
+              svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="30"/>';
             };
             svg += "</svg>"
-            $(legend).append(svg)
+            var svgLegend = $("div.legend-control-container").append(svg)
             return(legend);
             //return(legendContent);
             //return legendContent;
@@ -190,11 +192,10 @@ function createLegend(attributes){
           delete legend
         }
     });
-
     map.addControl(new LegendControl());
 };
 function updateLegend(legend){
-
+  print('pie iesu domine')
   // var legend = L.DomUtil.create('div', 'legend-control-container');
   // var index = $('.range-slider').val();
   // if (index == 0){
@@ -246,10 +247,10 @@ function updatePropSymbols(attribute){
       popupContent += "<p><b>COVID-19 cases :</b> " + props[attribute] + " people</p>";
       popup = layer.getPopup();
       popup.setContent(popupContent).update();
+      //calcStats();
     };
-
-  })
-createLegend();
+  });
+createLegend()
 };
 function createMap(){
   map = L.map("mapid", {
@@ -269,9 +270,10 @@ function getData(mapid){
       dataType: "json",
       success: function(response){
         var attributes = processData(response);
-        minValue = calcStats(response);
+        calcStats(response);
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
+        createLegend();
         addDescript();
       }
     });

@@ -1,7 +1,5 @@
 var map;
 var dataStats = {};
-//var legend = L.DomUtil.create('div', 'legend-control-container');
-
 
 function processData(data){  //processes Data
   var attributes = [];
@@ -88,11 +86,13 @@ function pointToLayer(feature, latlng, attributes){   //adds point features to l
   return layer;
 
 };
+
 function calcPropRadius(attValue){
   var minRadius = 4.5
   var radius = 1.0083 * Math.pow(attValue/dataStats.min,0.5715) * minRadius
   return radius;
 };
+
 function createSequenceControls(attributes){  //creates Sequence Bar
   var SequenceControl = L.Control.extend({
     options: {
@@ -134,8 +134,8 @@ function createSequenceControls(attributes){  //creates Sequence Bar
   })
   createLegend(); //creates legend for initial timestamp
 }
+
 function createLegend(attributes){
-//map.remove('legend-control-container');
     var LegendControl = L.Control.extend({  //creates control extension
         options: {
             position: 'bottomright' //places in bottom right
@@ -195,8 +195,9 @@ function createLegend(attributes){
         }
     });
     map.addControl(new LegendControl());
-};
-function updateLegend(attributes){   /////Currently, is the same as createLegend because I cannot figure out how to
+  }
+
+function updateLegend(){   /////Currently, is the same as createLegend because I cannot figure out how to
   var LegendControl = L.Control.extend({   //update the legend without either A. causing multiple legends to appear or
       options: {                          // B. stop the legend from updating altogether -- unsure how to fix this
           position: 'bottomright'
@@ -246,13 +247,11 @@ function updateLegend(attributes){   /////Currently, is the same as createLegend
           var svg = '<svg class="attribute-legend" width="200px" height="130px">';
           var circles = ['max', 'mean', 'min'];
           for (var i=0; i<circles.length; i++){
-            console.log(circles[i])
             var radius = calcPropRadius(dataStats[circles[i]]);
-            console.log(radius)
             var cy = 129 - radius;
             svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
-            var textY = i*20+20;
-            svg += '<text id="'+circles[i]+'-text" x="100px" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+"people"+'</text>'
+            var textY = i*20+80;
+            svg += '<text id="'+circles[i]+'-text" x="125" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+"people"+'</text>'
             };
           svg += "</svg>"
           var svgLegend = $("div.legend-control-container").append(svg)
@@ -265,9 +264,11 @@ function updateLegend(attributes){   /////Currently, is the same as createLegend
 
   map.addControl(new LegendControl());
 };
+
 function addDescript(){ //adds title
   $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in selected Mainland Chinese provinces outside of Hubei (1/25/2020 - 2/7/2020)</p></b>')
 }
+
 function updatePropSymbols(attribute){ //dynamic update to proportional symbols
   map.eachLayer(function(layer){
     if (layer.feature && layer.feature.properties[attribute]){
@@ -283,8 +284,9 @@ function updatePropSymbols(attribute){ //dynamic update to proportional symbols
       //calcStats();
     };
   });
-updateLegend(); //updates legend
+  updateLegend(); //updates legend
 };
+
 function createMap(){ //creates map
   var nEast = [51.0, 143.0]
   var sWest = [9.666664, 80.0]
@@ -306,6 +308,7 @@ function createMap(){ //creates map
   }).addTo(map);
   getData(); //grabs data when map constructed
 };
+
 function getData(mapid){  //data calculation
     $.ajax("data/chinaCorona.geojson",{ //grabs geojson
       dataType: "json",

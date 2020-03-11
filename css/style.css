@@ -11,7 +11,7 @@
 .sequence-control-container {
   width: 350px;
   height: 30px;
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255,255,255,0.7);
   padding: 10px;
   line-height: 45px;
   text-align: center;
@@ -20,14 +20,14 @@
 .legend-control-container{
   width: 250px;
   height: 150px;
-  background-color: rgba(255,255,255,0.8);
+  background-color: rgba(255,255,255,0.7);
   padding: 10px;
   line-height: 0px;
   text-align: center;
   border: solid gray 1px;
 }
 .attribute-legend{
-  width: 200px;
+  width: 220px;
   height: 130px;
   text-align: right;
 }

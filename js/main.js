@@ -136,6 +136,7 @@ function createSequenceControls(attributes){
   createLegend();
 }
 function createLegend(attributes){
+//map.remove('legend-control-container');
     var LegendControl = L.Control.extend({
         options: {
             position: 'bottomright'
@@ -188,6 +189,8 @@ function createLegend(attributes){
               console.log(radius)
               var cy = 129 - radius;
               svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
+              var textY = i*20+20;
+              svg += '<text id="'+circles[i]+'-text" x="65" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+"people"+'</text>'
             };
             svg += "</svg>"
             var svgLegend = $("div.legend-control-container").append(svg)
@@ -209,6 +212,7 @@ function updateLegend(attributes){
           // create the control container with a particular class name
           var index = $('.range-slider').val();
           var legend = L.DomUtil.create('div', 'legend-control-container');
+          //LegendControl.removeFrom(map);
           var temporal = '<div class="temporalLegend" width="250px" height="15px">';
           $(legend).append(temporal);
           if (index == 0){
@@ -244,7 +248,7 @@ function updateLegend(attributes){
           var temporalContent = $('div.temporalLegend').html(legendContent);
 
           //Attribute Legend
-          var svg = '<svg class="attribute-legend" width="130px" height="130px">';
+          var svg = '<svg class="attribute-legend" width="200px" height="130px">';
           var circles = ['max', 'mean', 'min'];
           for (var i=0; i<circles.length; i++){
             console.log(circles[i])
@@ -252,7 +256,9 @@ function updateLegend(attributes){
             console.log(radius)
             var cy = 129 - radius;
             svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
-          };
+            var textY = i*20+20;
+            svg += '<text id="'+circles[i]+'-text" x="100px" y="'+textY+'">'+Math.round(dataStats[circles[i]]*100)/100+"people"+'</text>'
+            };
           svg += "</svg>"
           var svgLegend = $("div.legend-control-container").append(svg)
           return(legend);

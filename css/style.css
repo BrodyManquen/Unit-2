@@ -28,11 +28,12 @@
 }
 .attribute-legend{
   width: 200px;
-  height: 100px;
+  height: 200px;
+  text-align: center;
 }
 .temporalLegend{
-  width: 160px;
-  height: 60px;
+  width: 250px;
+  height: 15px;
 }
 .range-slider {
   width: 250px;

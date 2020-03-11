@@ -1,7 +1,7 @@
 //my stylesheet
 
 #mapid {
-    height: 400px;
+    height: 600px;
     width: 100%;
     display: inline-block;
 }
@@ -27,13 +27,13 @@
   border: solid gray 1px;
 }
 .attribute-legend{
-  width: 200px;
-  height: 200px;
+  width: 130px;
+  height: 130px;
   text-align: center;
 }
 .temporalLegend{
   width: 250px;
-  height: 15px;
+  height: 10px;
 }
 .range-slider {
   width: 250px;
@@ -58,10 +58,12 @@
     width: 40px;
 }
 #description {
-  width: 75%;
+  width: 100%;
+  height: 220px;
   padding: 10px;
   display: inline-block;
   vertical-align: top;
   text-align: center;
   line-height: normal;
+  background-color: rgba(192,192,192,0.6);
 }

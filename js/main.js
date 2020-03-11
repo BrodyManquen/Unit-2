@@ -1,6 +1,7 @@
 var map;
 var dataStats = {};
-var legend = L.DomUtil.create('div', 'legend-control-container');
+//var legend = L.DomUtil.create('div', 'legend-control-container');
+
 
 function processData(data){
   var attributes = [];
@@ -62,6 +63,7 @@ function createPropSymbols(data, attributes){
       return pointToLayer(feature, latlng, attributes);
     }
   }).addTo(map);
+  createLegend();
 };
 
 function pointToLayer(feature, latlng, attributes){
@@ -71,7 +73,7 @@ function pointToLayer(feature, latlng, attributes){
     color: "#000",
     weight: 1,
     opacity: 1,
-    fillOpacity: 0.8
+    fillOpacity: 0.6
   };
   var attValue = Number(feature.properties[attribute]);
   options.radius = calcPropRadius(attValue);
@@ -84,6 +86,7 @@ function pointToLayer(feature, latlng, attributes){
         offset: new L.Point(0,-options.radius)
     });
   return layer;
+
 };
 function calcPropRadius(attValue){
   var minRadius = 4.5
@@ -105,6 +108,7 @@ function createSequenceControls(attributes){
     }
   });
   map.addControl(new SequenceControl());
+
   $(reverse).html('<img src="img/reverse.png">');
   $(forward).html('<img src="img/forward.png">');
   $('.range-slider').attr({
@@ -129,7 +133,6 @@ function createSequenceControls(attributes){
     var index = $('.range-slider').val();
     updatePropSymbols(attributes[index])
   })
-
   createLegend();
 }
 function createLegend(attributes){
@@ -138,6 +141,7 @@ function createLegend(attributes){
             position: 'bottomright'
         },
         onAdd: function () {
+          map.legend = this;
             // create the control container with a particular class name
             var index = $('.range-slider').val();
             var legend = L.DomUtil.create('div', 'legend-control-container');
@@ -173,65 +177,92 @@ function createLegend(attributes){
               var date = "2/7/2020"
             };
             var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
-            var temporalContent = $('div.temporalLegend').append(legendContent);
+            var temporalContent = $('div.temporalLegend').html(legendContent);
+
             //Attribute Legend
-            var svg = '<svg class="attribute-legend" width="200px" height="200px">';
+            var svg = '<svg class="attribute-legend" width="130px" height="130px">';
             var circles = ['max', 'mean', 'min'];
             for (var i=0; i<circles.length; i++){
+              console.log(circles[i])
               var radius = calcPropRadius(dataStats[circles[i]]);
-              var cy = 59 - radius;
-              svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="30"/>';
+              console.log(radius)
+              var cy = 129 - radius;
+              svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
             };
             svg += "</svg>"
             var svgLegend = $("div.legend-control-container").append(svg)
             return(legend);
-            //return(legendContent);
-            //return legendContent;
         },
         onRemove: function(){
-          delete legend
+          console.log('pie jesu domine')
         }
     });
     map.addControl(new LegendControl());
 };
-function updateLegend(legend){
-  print('pie iesu domine')
-  // var legend = L.DomUtil.create('div', 'legend-control-container');
-  // var index = $('.range-slider').val();
-  // if (index == 0){
-  //   var date = "1/25/2020";
-  // }else if (index == 1) {
-  //   var date = "1/26/2020"
-  // }else if (index == 2) {
-  //   var date = "1/27/2020"
-  // }else if (index == 3) {
-  //   var date = "1/28/2020"
-  // }else if (index == 4) {
-  //   var date = "1/29/2020"
-  // }else if (index == 5) {
-  //   var date = "1/30/2020"
-  // }else if (index == 6) {
-  //   var date = "1/31/2020"
-  // }else if (index == 7) {
-  //   var date = "2/1/2020"
-  // }else if (index == 8) {
-  //   var date = "2/2/2020"
-  // }else if (index == 9) {
-  //   var date = "2/3/2020"
-  // }else if (index == 10) {
-  //   var date = "2/4/2020"
-  // }else if (index == 11) {
-  //   var date = "2/5/2020"
-  // }else if (index == 12) {
-  //   var date = "2/6/2020"
-  // }else if(index == 13) {
-  //   var date = "2/7/2020"
-  // };
-  // var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
-  // $(legend).append(legendContent);
-  // legend.addTo(map)
-  // return legend
-}
+function updateLegend(attributes){
+  var LegendControl = L.Control.extend({
+      options: {
+          position: 'bottomright'
+      },
+      onAdd: function () {
+        map.legend = this;
+          // create the control container with a particular class name
+          var index = $('.range-slider').val();
+          var legend = L.DomUtil.create('div', 'legend-control-container');
+          var temporal = '<div class="temporalLegend" width="250px" height="15px">';
+          $(legend).append(temporal);
+          if (index == 0){
+            var date = "1/25/2020";
+          }else if (index == 1) {
+            var date = "1/26/2020"
+          }else if (index == 2) {
+            var date = "1/27/2020"
+          }else if (index == 3) {
+            var date = "1/28/2020"
+          }else if (index == 4) {
+            var date = "1/29/2020"
+          }else if (index == 5) {
+            var date = "1/30/2020"
+          }else if (index == 6) {
+            var date = "1/31/2020"
+          }else if (index == 7) {
+            var date = "2/1/2020"
+          }else if (index == 8) {
+            var date = "2/2/2020"
+          }else if (index == 9) {
+            var date = "2/3/2020"
+          }else if (index == 10) {
+            var date = "2/4/2020"
+          }else if (index == 11) {
+            var date = "2/5/2020"
+          }else if (index == 12) {
+            var date = "2/6/2020"
+          }else if(index == 13) {
+            var date = "2/7/2020"
+          };
+          var legendContent = "<p><b>Reported COVID-19 cases on " + date + "</b></p>";
+          var temporalContent = $('div.temporalLegend').html(legendContent);
+
+          //Attribute Legend
+          var svg = '<svg class="attribute-legend" width="130px" height="130px">';
+          var circles = ['max', 'mean', 'min'];
+          for (var i=0; i<circles.length; i++){
+            console.log(circles[i])
+            var radius = calcPropRadius(dataStats[circles[i]]);
+            console.log(radius)
+            var cy = 129 - radius;
+            svg += '<circle class="legend-circle" id="' + circles[i] + '" r="'+radius+'"cy="'+cy+'"" fill="#FD5555" fill-opacity="0.8" stroke="#000" cx="60"/>';
+          };
+          svg += "</svg>"
+          var svgLegend = $("div.legend-control-container").append(svg)
+          return(legend);
+      },
+      onRemove: function(){
+        console.log('pie jesu domine')
+      }
+  });
+  map.addControl(new LegendControl());
+};
 function addDescript(){
   $("#description").append('<p><b>Reported COVID-19 (Coronavirus) cases in selected Mainland Chinese provinces outside of Hubei (1/25/2020 - 2/7/2020)</p></b>')
 }
@@ -250,18 +281,26 @@ function updatePropSymbols(attribute){
       //calcStats();
     };
   });
-createLegend()
+updateLegend();
 };
 function createMap(){
+  var nEast = [51.0, 143.0]
+  var sWest = [9.666664, 80.0]
+  bounds = L.latLngBounds(sWest, nEast);
   map = L.map("mapid", {
+    maxBounds: bounds,
+    minZoom: 5,
+    maxZoom: 5,
     center: [30.9756, 112.2707],
-    zoom: 5
+    zoom: 6
   });
-  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-      attribution: 'Map data &copy; <a href="https://systems.jhu.edu/research/public-health/ncov/">Mapping 2019-nCoV Johns Hopkins CSSE</a> <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-      maxZoom: 18,
-      id: 'mapbox/streets-v11',
-      accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
+
+  L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+      //attribution: 'Map data &copy; <a href="https://systems.jhu.edu/research/public-health/ncov/">Mapping 2019-nCoV Johns Hopkins CSSE</a> <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      attribution: '&copy; <a href="https://systems.jhu.edu/research/public-health/ncov/">Mapping 2019-nCoV Johns Hopkins CSSE</a> <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+      maxZoom: 8
+      //id: 'mapbox/streets-v11',
+      //accessToken: 'pk.eyJ1IjoiYnJvZHltYW5xdWVuIiwiYSI6ImNrNmpyOTloczAwamgzZnFxYWh3ajYzaDMifQ.6CFEgY3Fd0NQ5EqkpzvspA'
   }).addTo(map);
   getData();
 };
@@ -273,7 +312,6 @@ function getData(mapid){
         calcStats(response);
         createPropSymbols(response, attributes);
         createSequenceControls(attributes);
-        createLegend();
         addDescript();
       }
     });

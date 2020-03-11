@@ -1,3 +1,5 @@
+//Reported COVID-19 Cases outside of Hubei in mainland China Jan25-Feb7
+//Brody W. Manquen 3/11/2020
 var map;
 var dataStats = {};
 
